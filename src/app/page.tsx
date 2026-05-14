@@ -980,25 +980,27 @@ export default function TenantRightsChecker() {
             })}
           </div>
 
-          <label className="form-label">{t('modal.keyLabel')}</label>
-          <a href={PROVIDER_INFO[provider]?.keyUrl} target="_blank" rel="noopener noreferrer" className="muted-hint" style={{ fontWeight: 500, color: 'var(--accent)', display: 'inline-block', marginBottom: '8px' }}>
-            {PROVIDER_INFO[provider]?.keyLabel}
-          </a>
-          <input
-            type="password"
-            className="input-text"
-            placeholder={`Paste ${PROVIDER_INFO[provider]?.name} API key`}
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            suppressHydrationWarning
-          />
-          <p className="muted-hint" style={{ marginBottom: '16px' }}>
-            {t('modal.keyHelp')}
-          </p>
+          <form onSubmit={(e) => { e.preventDefault(); handleSaveConfig(); }}>
+            <label className="form-label">{t('modal.keyLabel')}</label>
+            <a href={PROVIDER_INFO[provider]?.keyUrl} target="_blank" rel="noopener noreferrer" className="muted-hint" style={{ fontWeight: 500, color: 'var(--accent)', display: 'inline-block', marginBottom: '8px' }}>
+              {PROVIDER_INFO[provider]?.keyLabel}
+            </a>
+            <input
+              type="password"
+              className="input-text"
+              placeholder={`Paste ${PROVIDER_INFO[provider]?.name} API key`}
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              suppressHydrationWarning
+            />
+            <p className="muted-hint" style={{ marginBottom: '16px' }}>
+              {t('modal.keyHelp')}
+            </p>
 
-          <button type="button" className="btn-primary" style={{ width: '100%', marginBottom: '12px' }} disabled={!apiKey.trim()} onClick={() => handleSaveConfig()}>
-            {t('modal.saveKey')}
-          </button>
+            <button type="submit" className="btn-primary" style={{ width: '100%', marginBottom: '12px' }} disabled={!apiKey.trim()}>
+              {t('modal.saveKey')}
+            </button>
+          </form>
 
           {configured && (
             <button
@@ -1262,7 +1264,7 @@ export default function TenantRightsChecker() {
                   })}
                 </div>
 
-                <div className="key-input-box">
+                <form className="key-input-box" onSubmit={(e) => { e.preventDefault(); handleSaveConfig(); }}>
                   <label className="form-label" style={{ marginBottom: 4 }}>{t('s0.apiKey')}</label>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
                     <span className="muted-hint">{t('s0.keyHint')}</span>
@@ -1277,16 +1279,15 @@ export default function TenantRightsChecker() {
                     placeholder={`${PROVIDER_INFO[provider]?.name} API key`}
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSaveConfig()}
                     suppressHydrationWarning
                   />
-                  <button type="button" className="btn-primary" style={{ width: '100%' }} disabled={!apiKey.trim()} onClick={() => handleSaveConfig()}>
+                  <button type="submit" className="btn-primary" style={{ width: '100%' }} disabled={!apiKey.trim()}>
                     {t('s0.saveContinue')}
                   </button>
                   <p className="muted-hint" style={{ marginTop: 14, textAlign: 'center' }}>
                     Login is optional. Use the app without login, or sign in from the sidebar to save and reload your results later.
                   </p>
-                </div>
+                </form>
               </div>
             )}
 
