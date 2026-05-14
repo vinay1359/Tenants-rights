@@ -57,7 +57,9 @@ export async function middleware(request: NextRequest) {
     'https://generativelanguage.googleapis.com',
     'https://api.groq.com',
     'https://api.openai.com',
-    'https://api.anthropic.com'
+    'https://api.anthropic.com',
+    // Vercel Analytics beacon endpoint
+    'https://vitals.vercel-insights.com'
   );
 
   // In development, allow localhost and HMR websocket connections
@@ -70,7 +72,7 @@ export async function middleware(request: NextRequest) {
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      `script-src 'self' 'unsafe-inline'${!isProd ? " 'unsafe-eval'" : ''}`,
+      `script-src 'self' 'unsafe-inline' https://vitals.vercel-insights.com${!isProd ? " 'unsafe-eval'" : ''}`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob:",

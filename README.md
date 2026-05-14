@@ -62,7 +62,7 @@ Open [http://localhost:3000](http://localhost:3000).
 ## How to use it
 
 1. Open the app.
-2. Pick an AI provider (Groq is free) and paste your API key.
+2. Pick an AI provider (Gemini is free and recommended) and paste your API key.
 3. Describe your problem in plain English.
 4. Tell us your state or country, and optionally your city.
 5. Review and hit "Run check."
@@ -80,7 +80,7 @@ This is the most important part. We never store your API key on any server or da
 2. It is encrypted and saved in a **secure browser cookie** (httpOnly, sameSite strict, HTTPS-only in production).
 3. The cookie auto-expires after **30 minutes** of inactivity.
 4. JavaScript on the page **cannot read** the cookie (httpOnly flag).
-5. The key is only sent to **our server** when you run a check, and the server uses it to call your AI provider (Groq, OpenAI, etc.) on your behalf.
+5. The key is only sent to **our server** when you run a check, and the server uses it to call your AI provider (Groq, Gemini, OpenAI, etc.) on your behalf.
 6. The key is **never** stored in Supabase, localStorage, or any database.
 7. On a shared computer, you can remove the key from Settings, or use incognito mode.
 
@@ -172,7 +172,6 @@ This project takes security seriously. Here is what is implemented:
 - Case timeline
 - Local tenant resources (legal aid, housing agencies, hotlines)
 - PDF export of everything
-- Dark and light mode
 - Mobile responsive
 - Optional sign-in to save results
 
@@ -185,6 +184,7 @@ src/
   app/
     page.tsx              Main UI (single-page app)
     globals.css           All styles
+    layout.tsx            Root layout with Vercel Analytics
     api/
       analyze/route.ts    AI analysis endpoint (all 5 actions)
       config/route.ts     API key cookie management
@@ -192,18 +192,27 @@ src/
       callback/route.ts   Magic link callback
   components/
     JurisdictionField.tsx  Location autocomplete
+    providers.tsx          Client-side provider wrapper
   lib/
     ai-providers.ts       Provider config (Groq, Gemini, OpenAI, Claude)
     chat-storage.ts       Supabase CRUD for saved results
     evidence-checklists.ts Evidence items by dispute type
+    jurisdictions.ts      Autocomplete suggestion labels
     pdf-generator.ts      Custom jsPDF report builder
     prompts.ts            All AI system and user prompts
     rate-limit.ts         IP-based sliding window limiter
     safety.ts             Input validation and blocked terms
+    secure-config.ts      AES-GCM encryption for API key cookies
     strings.ts            All UI text (single source of truth)
     types.ts              TypeScript interfaces
     xml-parser.ts         Parse structured AI responses
+    supabase/
+      client.ts           Browser Supabase client
+      server.ts           Server Supabase client
   middleware.ts           Security headers and Supabase session refresh
+supabase/
+  migrations/
+    001_saved_chats.sql   Schema and RLS policies for saved results
 ```
 
 ---
