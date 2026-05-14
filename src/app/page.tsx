@@ -200,7 +200,7 @@ export default function TenantRightsChecker() {
           if (data.configured) {
             setConfigured(true);
             setProvider(data.provider || 'groq');
-            setKeyHint(data.keyHint || '');
+            setKeyHint(t('nav.keyCookie'));
             setScreen(1);
           } else {
             setConfigured(false);
@@ -279,7 +279,7 @@ export default function TenantRightsChecker() {
       if (res.ok) {
         setConfigured(true);
         setProvider(p);
-        setKeyHint('****' + k.trim().slice(-4));
+        setKeyHint(t('nav.keyCookie'));
         setApiKey('');
         setSettingsOpen(false);
         if (screen === 0) setScreen(1);
@@ -300,7 +300,7 @@ export default function TenantRightsChecker() {
       const d = await r.json();
       setConfigured(!!d.configured);
       setProvider(d.provider || 'groq');
-      setKeyHint(d.keyHint || '');
+      setKeyHint(d.configured ? t('nav.keyCookie') : '');
       setScreen(d.configured ? 1 : 0);
     } catch {
       setConfigured(false);
@@ -949,7 +949,7 @@ export default function TenantRightsChecker() {
         <div className="modal-body">
           {configured && (
             <div className="settings-banner">
-              {t('modal.connected', { provider: PROVIDER_INFO[provider]?.name ?? '', hint: keyHint })}
+              {t('modal.connected', { provider: PROVIDER_INFO[provider]?.name ?? '', hint: keyHint || t('nav.keyCookie') })}
             </div>
           )}
 
@@ -1163,7 +1163,7 @@ export default function TenantRightsChecker() {
                   {!configured ? t('nav.addKey') : PROVIDER_INFO[provider]?.name}
                 </div>
                 <div className="provider-pill-subtitle">
-                  {configured ? `Active token ${keyHint}` : t('nav.keyRequired')}
+                  {configured ? keyHint || t('nav.keyCookie') : t('nav.keyRequired')}
                 </div>
               </div>
             </div>

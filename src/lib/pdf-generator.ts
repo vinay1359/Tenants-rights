@@ -324,7 +324,6 @@ export function generatePDF(data: PDFData): boolean {
     doc.save(filename);
     return true;
   } catch (err) {
-    console.error('PDF Build Failure:', err);
     return false;
   }
 }

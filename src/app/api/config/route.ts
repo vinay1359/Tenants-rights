@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
 import {
   CONFIG_COOKIE_MAX_AGE,
   CONFIG_COOKIE_NAME,
@@ -24,13 +23,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       configured: true,
       provider: cookieCfg.provider,
-      keyHint: '****' + cookieCfg.apiKey.slice(-4),
-      source: 'cookie' as const,
-      expiresInSeconds: CONFIG_COOKIE_MAX_AGE,
     });
   }
 
-  return NextResponse.json({ configured: false, provider: null, keyHint: '', source: null });
+  return NextResponse.json({ configured: false, provider: null });
 }
 
 export async function POST(req: NextRequest) {
@@ -47,24 +43,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'API key looks invalid. Check the key and try again.' }, { status: 400 });
     }
 
-    let isLoggedIn = false;
-    try {
-      const supabase = await createSupabaseServerClient();
-      if (supabase) {
-        const { data: { user } } = await supabase.auth.getUser();
-        isLoggedIn = !!user;
-      }
-    } catch {
-      // Supabase is optional. API key handling must still work without it.
-    }
-
     const encoded = await encryptConfig(trimmedKey, provider);
     const response = NextResponse.json({
       success: true,
       provider,
-      source: 'cookie' as const,
-      loggedIn: isLoggedIn,
-      expiresInSeconds: CONFIG_COOKIE_MAX_AGE,
     });
     response.cookies.set(CONFIG_COOKIE_NAME, encoded, COOKIE_OPTIONS);
     return response;
