@@ -6,6 +6,7 @@
 type Bucket = { windowStart: number; count: number };
 
 const buckets = new Map<string, Bucket>();
+const IP_RE = /^(?:\d{1,3}\.){3}\d{1,3}$|^[a-f0-9:]+$/i;
 
 function windowMs(): number {
   return 60_000;
@@ -17,13 +18,19 @@ function maxHits(): number {
 }
 
 export function getRequestIp(req: { headers: Headers }): string {
+  const real = req.headers.get('x-real-ip')?.trim();
+  if (real && IP_RE.test(real)) return real;
+
   const xf = req.headers.get('x-forwarded-for');
   if (xf) {
-    const first = xf.split(',')[0]?.trim();
-    if (first) return first;
+    const forwarded = xf
+      .split(',')
+      .map((part) => part.trim())
+      .filter((part) => IP_RE.test(part));
+    const last = forwarded.at(-1);
+    if (last) return last;
   }
-  const real = req.headers.get('x-real-ip');
-  if (real) return real.trim();
+
   return 'unknown';
 }
 

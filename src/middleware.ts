@@ -44,13 +44,11 @@ export async function middleware(request: NextRequest) {
   // Build connect-src dynamically based on configured Supabase URL
   const connectSources = ["'self'"];
   if (url) {
-    // Allow both the main URL and auth/realtime subdomains
-    connectSources.push(url);
     try {
       const parsed = new URL(url);
-      connectSources.push(`https://*.${parsed.hostname.split('.').slice(-2).join('.')}`);
-      // Realtime uses wss://
-      connectSources.push(`wss://*.${parsed.hostname.split('.').slice(-2).join('.')}`);
+      // Supabase API and realtime use the configured project host.
+      connectSources.push(parsed.origin);
+      connectSources.push(`wss://${parsed.hostname}`);
     } catch { /* ignore */ }
   }
   connectSources.push(

@@ -323,7 +323,7 @@ export function generatePDF(data: PDFData): boolean {
     const filename = `tenant-rights-audit-${safeLoc}-${Date.now()}.pdf`;
     doc.save(filename);
     return true;
-  } catch (err) {
+  } catch {
     return false;
   }
 }

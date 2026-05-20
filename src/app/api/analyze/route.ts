@@ -217,6 +217,36 @@ function isBlockedFetchHost(hostname: string): boolean {
   return false;
 }
 
+function resolveRedirectUrl(currentUrl: string, location: string | null): string {
+  if (!location) return '';
+  try {
+    return new URL(location, currentUrl).toString();
+  } catch {
+    return '';
+  }
+}
+
+async function fetchAllowedLawUrl(url: string, method: 'HEAD' | 'GET'): Promise<Response> {
+  let currentUrl = url;
+  for (let redirects = 0; redirects <= 3; redirects += 1) {
+    const parsed = new URL(currentUrl);
+    if (parsed.protocol !== 'https:' || isBlockedFetchHost(parsed.hostname)) {
+      throw new Error('Blocked citation URL destination.');
+    }
+
+    const res = await fetch(currentUrl, { method, redirect: 'manual' });
+    if (![301, 302, 303, 307, 308].includes(res.status)) {
+      return res;
+    }
+
+    const nextUrl = resolveRedirectUrl(currentUrl, res.headers.get('location'));
+    if (!nextUrl) throw new Error('Invalid citation URL redirect.');
+    currentUrl = nextUrl;
+  }
+
+  throw new Error('Too many citation URL redirects.');
+}
+
 async function verifyLawUrl(url: string): Promise<{ verified: boolean; note: string }> {
   if (!url) return { verified: false, note: 'No URL returned.' };
   try {
@@ -224,10 +254,10 @@ async function verifyLawUrl(url: string): Promise<{ verified: boolean; note: str
     if (isBlockedFetchHost(parsed.hostname)) {
       return { verified: false, note: 'The source URL was not checked because the host is not allowed.' };
     }
-    const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+    const res = await fetchAllowedLawUrl(url, 'HEAD');
     if (res.ok) return { verified: true, note: 'The source URL responded successfully.' };
     if (res.status === 405 || res.status === 403) {
-      const getRes = await fetch(url, { method: 'GET', redirect: 'follow' });
+      const getRes = await fetchAllowedLawUrl(url, 'GET');
       return {
         verified: getRes.ok,
         note: getRes.ok ? 'The source URL responded successfully.' : 'The source URL could not be confirmed.',
